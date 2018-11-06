@@ -10,14 +10,14 @@ class App extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.orange,
-        accentColor: Colors.purple,
+        accentColor: Colors.orange[500],
       ),
       home: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           title: Text('EasyList'),
         ),
-        body: ProductManager('Food tester')
+        body: ProductManager(initialProduct:  'Food tester',)
       ),
     );
   }

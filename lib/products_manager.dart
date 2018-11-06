@@ -3,8 +3,8 @@ import 'package:curso_udemy/products.dart';
 
 class ProductManager extends StatefulWidget {
   final String initialProduct;
-
-  ProductManager(this.initialProduct){}
+  // Named optional argument
+  ProductManager({this.initialProduct = 'No name Tester'}){}
 
   @override
   State<StatefulWidget> createState() {
@@ -38,7 +38,7 @@ class _ProductManagerState extends State<ProductManager> {
             },
           ),
         ),
-        Products(_products),
+        Expanded(child: Products(_products),),
       ],
     );
   }
