@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:curso_udemy/products.dart';
 
 class ProductManager extends StatefulWidget {
-  final String initialProduct;
+  final Map<String, String> initialProduct;
   // Named optional argument
   ProductManager({this.initialProduct}){}
 
@@ -14,7 +14,7 @@ class ProductManager extends StatefulWidget {
 }
 
 class _ProductManagerState extends State<ProductManager> {
-  List<String> _products = [];
+  List<Map<String, String>> _products = [];
 
   @override
     void initState() {
@@ -23,6 +23,12 @@ class _ProductManagerState extends State<ProductManager> {
         _products.add(widget.initialProduct);
       }
     }
+
+  void _addProduct(Map<String, String> product) {
+      this.setState(() {
+        _products.add(product);
+      });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +39,7 @@ class _ProductManagerState extends State<ProductManager> {
           child: RaisedButton(
             color: Theme.of(context).primaryColor,
             child: Text('Add Product'),
-            onPressed: () {
-              this.setState(() {
-                _products.add('Avanced Food Tester');
-              });
-            },
+            onPressed: () => _addProduct({'title': 'Chocolate', 'image' : 'assets/food.jpg'}),
           ),
         ),
         Expanded(child: Products(_products),),
