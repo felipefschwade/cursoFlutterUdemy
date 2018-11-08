@@ -1,3 +1,4 @@
+import 'package:curso_udemy/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:curso_udemy/products_manager.dart';
 
@@ -12,13 +13,7 @@ class App extends StatelessWidget {
         primarySwatch: Colors.orange,
         accentColor: Colors.orange[500],
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text('EasyList'),
-        ),
-        body: ProductManager()
-      ),
+      home: HomePage(),
     );
   }
 }
