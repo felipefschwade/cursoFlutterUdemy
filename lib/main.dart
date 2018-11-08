@@ -17,7 +17,7 @@ class App extends StatelessWidget {
           centerTitle: true,
           title: Text('EasyList'),
         ),
-        body: ProductManager(initialProduct:  'Food tester',)
+        body: ProductManager()
       ),
     );
   }

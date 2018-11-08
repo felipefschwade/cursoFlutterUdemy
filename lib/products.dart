@@ -15,11 +15,18 @@ class Products extends StatelessWidget {
     );
   }
 
+  Widget _buildProductList() {
+    if (products.length > 0) {
+      return ListView.builder(
+        itemBuilder: _buildProductItem,
+        itemCount: products.length,
+      );
+    }
+    return Center(child: Text('No products Found!'),);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemBuilder: _buildProductItem,
-      itemCount: products.length,
-    );
+    return _buildProductList();
   }
 }

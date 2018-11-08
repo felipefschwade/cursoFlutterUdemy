@@ -4,7 +4,7 @@ import 'package:curso_udemy/products.dart';
 class ProductManager extends StatefulWidget {
   final String initialProduct;
   // Named optional argument
-  ProductManager({this.initialProduct = 'No name Tester'}){}
+  ProductManager({this.initialProduct}){}
 
   @override
   State<StatefulWidget> createState() {
@@ -19,7 +19,9 @@ class _ProductManagerState extends State<ProductManager> {
   @override
     void initState() {
       super.initState();
-      _products.add(widget.initialProduct);
+      if (widget.initialProduct != null) {
+        _products.add(widget.initialProduct);
+      }
     }
 
   @override
