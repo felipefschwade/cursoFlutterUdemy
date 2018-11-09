@@ -30,6 +30,12 @@ class _ProductManagerState extends State<ProductManager> {
       });
   }
 
+  void _deleteProduct(int index) {
+    this.setState(() {
+      _products.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -42,7 +48,7 @@ class _ProductManagerState extends State<ProductManager> {
             onPressed: () => _addProduct({'title': 'Chocolate', 'image' : 'assets/food.jpg'}),
           ),
         ),
-        Expanded(child: Products(_products),),
+        Expanded(child: Products(_products, deleteProduct: _deleteProduct),),
       ],
     );
   }

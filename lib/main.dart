@@ -1,6 +1,5 @@
-import 'package:curso_udemy/pages/home.dart';
+import 'package:curso_udemy/pages/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:curso_udemy/products_manager.dart';
 
 void main() => runApp(new App());
 
@@ -13,7 +12,7 @@ class App extends StatelessWidget {
         primarySwatch: Colors.orange,
         accentColor: Colors.greenAccent,
       ),
-      home: HomePage(),
+      home: AuthPage(),
     );
   }
 }
