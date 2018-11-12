@@ -24,21 +24,13 @@ class CustomDrawer extends StatelessWidget {
           ListTile(
             title: Text('Manage Products'),
             onTap: () {
-              Navigator.push(
-                context, 
-                MaterialPageRoute(
-                  builder: (BuildContext context) => AdminPage(),
-                ));
+              Navigator.pushNamed(context, "/admin");
             },
           ),
           ListTile(
             title: Text('All Products'),
             onTap: () {
-              Navigator.push(
-                context, 
-                MaterialPageRoute(
-                  builder: (BuildContext context) => ProductsPage(),
-                ));
+              Navigator.pushReplacementNamed(context, "/");
             },
           )
         ],

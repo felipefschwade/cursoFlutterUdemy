@@ -1,4 +1,3 @@
-import 'package:curso_udemy/pages/products_page.dart';
 import 'package:flutter/material.dart';
 
 class AuthPage extends StatelessWidget {
@@ -13,7 +12,7 @@ class AuthPage extends StatelessWidget {
           child: RaisedButton(
             child: Text('Login'),
             onPressed: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => ProductsPage()));
+              Navigator.pushReplacementNamed(context, "/products");
             },
           ),
         ),
