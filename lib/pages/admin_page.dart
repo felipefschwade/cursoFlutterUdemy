@@ -4,6 +4,11 @@ import 'package:curso_udemy/pages/product_list.dart';
 import 'package:flutter/material.dart';
 
 class AdminPage extends StatelessWidget {
+  final Function addProduct;
+  final Function deleteProduct;
+
+  AdminPage(this.addProduct, this.deleteProduct);
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -29,7 +34,7 @@ class AdminPage extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            ProductCreatePage(),
+            ProductCreatePage(addProduct),
             ProductListPage(),
           ],
         )
