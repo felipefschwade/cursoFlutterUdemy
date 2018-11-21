@@ -14,6 +14,7 @@ class CustomDrawer extends StatelessWidget {
             automaticallyImplyLeading: true,
             leading: IconButton(
               icon: Icon(Icons.menu),
+              color: Colors.white,
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -22,12 +23,14 @@ class CustomDrawer extends StatelessWidget {
             title: Text('Choose'),
           ),
           ListTile(
+            leading: Icon(Icons.create),
             title: Text('Manage Products'),
             onTap: () {
               Navigator.pushNamed(context, "/admin");
             },
           ),
           ListTile(
+            leading: Icon(Icons.shop),
             title: Text('All Products'),
             onTap: () {
               Navigator.pushReplacementNamed(context, "/products");

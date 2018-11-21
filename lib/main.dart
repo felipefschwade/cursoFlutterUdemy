@@ -38,6 +38,12 @@ class _AppState extends State<App> {
         primarySwatch: Colors.orange,
         accentColor: Colors.purple,
         errorColor: Colors.red,
+        primaryIconTheme: IconThemeData(
+          color: Colors.white
+        ),
+        primaryTextTheme: TextTheme(
+          title: TextStyle(color: Colors.white)
+        )
       ),
       home: AuthPage(),
       routes: {

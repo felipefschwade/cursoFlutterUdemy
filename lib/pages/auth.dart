@@ -11,8 +11,9 @@ class AuthPage extends StatefulWidget {
 }
 class _AuthPageState extends State<AuthPage> {
 
-  String email = "";
-  String password = "";
+  String _email = "";
+  String _password = "";
+  bool _acceptTerms = false;
 
   @override
   Widget build(BuildContext context) {
@@ -22,30 +23,48 @@ class _AuthPageState extends State<AuthPage> {
           title: Text('Login'),
         ),
         body: Container(
-          child: Padding(
-            padding: EdgeInsets.all(15.0),
-            child: ListView(
+          padding: EdgeInsets.all(15.0),
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.dstATop),
+              image: AssetImage('assets/background.jpg'),
+            )
+          ),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
               children: <Widget>[
                 TextField(
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    icon: Icon(Icons.email)
+                    filled: true,
+                    fillColor: Colors.white,
+                    icon: Icon(Icons.email),
                   ),
                   onChanged: (String value) {
-                    setState(() => email = value);
+                    setState(() => _email = value);
                   },
                 ),
+                SizedBox(height: 10.0,),
                 TextField(
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    filled: true,
+                    fillColor: Colors.white,
                     icon: Icon(Icons.lock)
                   ),
                   autocorrect: false,
                   obscureText: true,
                   onChanged: (String value) {
-                    setState(() => password = value);
+                    setState(() => _password = value);
                   },
+                ),
+                SwitchListTile(
+                  value: _acceptTerms,
+                  onChanged: (bool value) => setState(() => _acceptTerms = value),
+                  title: Text('Accept Terms', style: TextStyle(color: Colors.white),),
                 ),
                 SizedBox(height: 15.0),
                 RaisedButton(
@@ -58,8 +77,9 @@ class _AuthPageState extends State<AuthPage> {
                 ),
               ],
             ),
-          )
+          ),
         ),
+      ),
     );
   }
 }
