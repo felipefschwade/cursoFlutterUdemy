@@ -9,7 +9,6 @@ void main() => runApp(new App());
 class App extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _AppState();
   }
 
@@ -58,7 +57,12 @@ class _AppState extends State<App> {
         if (pathElements[1] == 'product') {
           final int index = int.parse(pathElements[2]);
           return MaterialPageRoute<bool>(
-            builder: (BuildContext context) => ProductPage(title: _products[index]['title'], imageUrl: _products[index]['image'],)
+            builder: (BuildContext context) => ProductPage(
+              title: _products[index]['title'], 
+              imageUrl: _products[index]['image'],
+              address: 'Union Square - San Francisco',
+              description: _products[index]['description'],
+              price: _products[index]['price'],)
           );
         }
         return null;

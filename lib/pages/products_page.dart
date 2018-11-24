@@ -1,5 +1,5 @@
 import 'package:curso_udemy/drawer.dart';
-import 'package:curso_udemy/products_manager.dart';
+import 'package:curso_udemy/widgets/products/products.dart';
 import 'package:flutter/material.dart';
 
 class ProductsPage extends StatelessWidget {
@@ -20,7 +20,7 @@ class ProductsPage extends StatelessWidget {
             )
           ],
         ),
-        body: ProductManager(products: products)
+        body: Products(products)
     );
   }
 

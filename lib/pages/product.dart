@@ -1,12 +1,15 @@
-
+import 'package:curso_udemy/widgets/ui_elements/title.dart';
 import 'package:flutter/material.dart';
 
 class ProductPage extends StatelessWidget {
 
   final String title;
   final String imageUrl;
+  final double price;
+  final String description;
+  final String address;
 
-  ProductPage({this.title, this.imageUrl});
+  ProductPage({this.title, this.imageUrl, this.address, this.description, this.price});
 
   void _showWarningDialog(BuildContext context) {
     showDialog(context: context, builder: (BuildContext builder) {
@@ -39,21 +42,35 @@ class ProductPage extends StatelessWidget {
           centerTitle: true,
           title: Text(title),
         ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.red,
+          child: Icon(Icons.delete_forever),
+          onPressed: () => _showWarningDialog(context),
+        ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Image.asset(imageUrl),
-            Container(child: Padding(padding: EdgeInsets.all(10.0), child:  Text('On product page'),),),
-            Container(
-              child: Padding(
-                padding: EdgeInsets.all(10.0), 
-                child:  RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  child: Text('Delete'), 
-                  onPressed: () => _showWarningDialog(context),
-                ),
+            SizedBox(height: 10.0),
+            PersonalTitle(title),
+            SizedBox(height: 10.0),
+            Text(
+              '${address} | \$ ${price}',
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 12.0
               ),
             ),
+            SizedBox(height: 10.0),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              child: Text(
+                description,
+                style: TextStyle(
+                  fontSize: 18.0,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
           ],
         ),
       ),
