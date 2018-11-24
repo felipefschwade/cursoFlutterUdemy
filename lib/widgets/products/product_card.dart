@@ -1,4 +1,5 @@
 import 'package:curso_udemy/widgets/products/price_tag.dart';
+import 'package:curso_udemy/widgets/products/product_tag.dart';
 import 'package:curso_udemy/widgets/ui_elements/title.dart';
 import 'package:flutter/material.dart';
 
@@ -27,17 +28,7 @@ class ProductCard extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 6.0, vertical:  2.5),
-            child: Text('Union Square - San Francisco'),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.grey,
-                width: 1.0
-              ),
-              borderRadius: BorderRadius.circular(5.0)
-            ),
-          ),
+          ProductTag('Union Square - San Francisco'),
           Text(product['description']),
           ButtonBar(
             alignment: MainAxisAlignment.center,
