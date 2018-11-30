@@ -10,6 +10,40 @@ class ProductCard extends StatelessWidget {
 
   ProductCard(this.product, this.index);
 
+  Widget _buildPriceRow() {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          PersonalTitle(product['title']),
+          SizedBox(width: 8.0),
+          PriceTag(price: product['price'].toString()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return ButtonBar(
+      alignment: MainAxisAlignment.center,
+      children: <Widget>[
+        IconButton(
+          color: Theme.of(context).primaryColor,
+          icon: Icon(Icons.info),
+          iconSize: 40.0,
+          onPressed: () => Navigator.pushNamed<bool>(context, '/product/${index.toString()}')
+        ),
+        IconButton(
+          icon: Icon(Icons.favorite_border),
+          color: Colors.red,
+          iconSize: 40.0,
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -17,36 +51,10 @@ class ProductCard extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Image.asset(product['image']),
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                PersonalTitle(product['title']),
-                SizedBox(width: 8.0),
-                PriceTag(price: product['price'].toString()),
-              ],
-            ),
-          ),
+          _buildPriceRow(),
           ProductTag('Union Square - San Francisco'),
           Text(product['description']),
-          ButtonBar(
-            alignment: MainAxisAlignment.center,
-            children: <Widget>[
-              IconButton(
-                color: Theme.of(context).primaryColor,
-                icon: Icon(Icons.info),
-                iconSize: 40.0,
-                onPressed: () => Navigator.pushNamed<bool>(context, '/product/${index.toString()}')
-              ),
-              IconButton(
-                icon: Icon(Icons.favorite_border),
-                color: Colors.red,
-                iconSize: 40.0,
-                onPressed: () {},
-              ),
-            ],
-          )
+          _buildActionButtons(context),
         ]),
     );;
   }

@@ -37,11 +37,13 @@ class _AppState extends State<App> {
         primarySwatch: Colors.orange,
         accentColor: Colors.purple,
         errorColor: Colors.red,
+        buttonColor: Colors.orange,
         primaryIconTheme: IconThemeData(
           color: Colors.white
         ),
         primaryTextTheme: TextTheme(
-          title: TextStyle(color: Colors.white)
+          title: TextStyle(color: Colors.white),
+          button: TextStyle(color: Colors.white),
         )
       ),
       home: AuthPage(),

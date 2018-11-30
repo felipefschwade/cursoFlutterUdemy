@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -37,5 +36,4 @@ class CustomDrawer extends StatelessWidget {
       ),
     );
   }
-  
 }
