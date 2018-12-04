@@ -16,55 +16,72 @@ class _ProductCreateState extends State<ProductCreatePage> {
   String _title = "";
   String _description = "";
   double _price = 0.0;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   
   Widget _buildTitleTextField() {
-    return TextField(
+    return TextFormField(
+      autovalidate: true,
       decoration: InputDecoration(
         labelText: 'Product Title',
         icon: Icon(Icons.perm_identity),
       ),
-      autocorrect: true,
-      onChanged: (String value) {
-        setState(() {
-          _title = value;   
-        });
+      onSaved: (String value) {
+        setState(() => _title = value);
+      },
+      validator: (String value) {
+        if (value.isEmpty) return "Title is required.";
+        if (value.length <= 4) return "Title must have at least 5 characters.";
+        return null;
       },
     );
   }
 
   Widget _buildDescriptionTextField() {
-    return TextField(
+    return TextFormField(
+      autovalidate: true,
         decoration: InputDecoration(
         labelText: 'Product Description',
         icon: Icon(Icons.description),
       ),
       autocorrect: true,
       maxLines: 5,
-      onChanged: (String value) {
-        setState(() {
-          _description = value;   
-        });
+      onSaved: (String value) {
+        setState(() => _description = value);
+      },
+      validator: (String value) {
+        if (value.isEmpty) return "Description is required.";
+        if (value.length <= 4) return "Description must have at least 5 characters.";
+        return null;
       },
     );
   }
 
   Widget _buildPriceTextField() {
-    return TextField(
+    return TextFormField(
+      autovalidate: true,
       decoration: InputDecoration(
         labelText: 'Product price',
         icon: Icon(Icons.monetization_on),
       ),
       autocorrect: true,
       keyboardType: TextInputType.number,
-      onChanged: (String value) {
-        setState(() {
-          _price = double.parse(value);   
-        });
+      onSaved: (String value) {
+        String newValue = value.replaceAll(",", ".");
+        setState(() => _price = double.parse(newValue));
+      },
+      validator: (String value) {
+        String newValue = value.replaceAll(",", ".");
+        if (newValue.isEmpty) return "Price is required.";
+        if (double.parse(newValue) < 1) return "Price must not be less than 1\$.";
+        return null;
       },
     );
   }
 
   void _submitForm() {
+    // Usage without autovalidate.
+    // if (!_formKey.currentState.validate()) return;
+    _formKey.currentState.save();
     final Map<String, dynamic> product = {
       'title': _title, 
       'price': _price, 
@@ -82,19 +99,23 @@ class _ProductCreateState extends State<ProductCreatePage> {
     final double targetPadding = deviceWidth - targetWidth;
     return Container(
       margin: EdgeInsets.all(10.0),
-      child: ListView(
-        padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
-        children: <Widget>[
-          _buildTitleTextField(),
-          _buildDescriptionTextField(),
-          _buildPriceTextField(),
-          SizedBox(height:  10.0),
-          RaisedButton(
-            child: Text('Save'),
-            textColor: Colors.white,
-            onPressed: _submitForm
-          )
-        ]),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
+          children: <Widget>[
+            _buildTitleTextField(),
+            _buildDescriptionTextField(),
+            _buildPriceTextField(),
+            SizedBox(height:  10.0),
+            RaisedButton(
+              child: Text('Save'),
+              textColor: Colors.white,
+              onPressed: _submitForm
+            )
+          ]
+        ),
+      ),
     );
   }
 }
