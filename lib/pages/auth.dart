@@ -8,8 +8,11 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  String _email = "";
-  String _password = "";
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Map<String, String> _formData = {
+    'email': null,
+    'password' : null,
+  };
   bool _acceptTerms = false;
 
   DecorationImage _buildImage() {
@@ -22,7 +25,7 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   Widget _buildEmailInput() {
-    return TextField(
+    return TextFormField(
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: 'Email',
@@ -30,14 +33,20 @@ class _AuthPageState extends State<AuthPage> {
         fillColor: Colors.white,
         icon: Icon(Icons.email),
       ),
-      onChanged: (String value) {
-        setState(() => _email = value);
+      onSaved: (String value) {
+        _formData['email'] = value;
+      },
+      validator: (String value) {
+        if (value.isEmpty) return "Email is required.";
+        if (value.length <= 5) return "Email must have at least 5 characters";
+        if (!value.contains('@') || !value.contains('.')) return "Email must be a valid email.";
+        return null;
       },
     );
   }
 
   Widget _buildPasswordInput() {
-    return TextField(
+    return TextFormField(
       decoration: InputDecoration(
           labelText: 'Password',
           filled: true,
@@ -45,8 +54,13 @@ class _AuthPageState extends State<AuthPage> {
           icon: Icon(Icons.lock)),
       autocorrect: false,
       obscureText: true,
-      onChanged: (String value) {
-        setState(() => _password = value);
+      onSaved: (String value) {
+        _formData['password'] = value;
+      },
+      validator: (String value) {
+        if (value.isEmpty) return "Password is required.";
+        if (value.length <= 5) return "Password must have at least 5 characters;";
+        return null;
       },
     );
   }
@@ -63,6 +77,13 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
+  void _sendForm() {
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      Navigator.pushReplacementNamed(context, "/products");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
@@ -72,31 +93,37 @@ class _AuthPageState extends State<AuthPage> {
         centerTitle: true,
         title: Text('Login'),
       ),
-      body: Container(
-        padding: EdgeInsets.all(15.0),
-        decoration: BoxDecoration(
-          image: _buildImage(),
-        ),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: Container(
-          alignment: Alignment.center,
-          child: SingleChildScrollView(
+          padding: EdgeInsets.all(15.0),
+          decoration: BoxDecoration(
+            image: _buildImage(),
+          ),
+          child: Form(
+            key: _formKey,
             child: Container(
-              width: targetWidth,
-              child: Column(
-                children: <Widget>[
-                  _buildEmailInput(),
-                  SizedBox(
-                    height: 10.0,
+              alignment: Alignment.center,
+              child: SingleChildScrollView(
+                child: Container(
+                  width: targetWidth,
+                  child: Column(
+                    children: <Widget>[
+                      _buildEmailInput(),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      _buildPasswordInput(),
+                      _buildAcceptSwitch(),
+                      SizedBox(height: 15.0),
+                      RaisedButton(
+                        child: Text('Login'),
+                        textColor: Colors.white,
+                        onPressed: _sendForm,
+                      ),
+                    ],
                   ),
-                  _buildPasswordInput(),
-                  _buildAcceptSwitch(),
-                  SizedBox(height: 15.0),
-                  RaisedButton(
-                    child: Text('Login'),
-                    textColor: Colors.white,
-                    onPressed: () => Navigator.pushReplacementNamed(context, "/products"),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
