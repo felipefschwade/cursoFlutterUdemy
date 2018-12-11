@@ -8,12 +8,13 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  Color _color = Colors.white;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final Map<String, String> _formData = {
+  final Map<String, dynamic> _formData = {
     'email': null,
     'password' : null,
+    'acceptTerms' : false,
   };
-  bool _acceptTerms = false;
 
   DecorationImage _buildImage() {
     return DecorationImage(
@@ -67,21 +68,23 @@ class _AuthPageState extends State<AuthPage> {
 
   Widget _buildAcceptSwitch() {
     return SwitchListTile(
-      value: _acceptTerms,
+      value: _formData['acceptTerms'],
       onChanged: (bool value) =>
-          setState(() => _acceptTerms = value),
+        setState(() => _formData['acceptTerms'] = value),
       title: Text(
         'Accept Terms',
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: _color),
       ),
     );
   }
 
   void _sendForm() {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-      Navigator.pushReplacementNamed(context, "/products");
+    if (!_formData['acceptTerms']) setState(() => _color = Colors.red);
+    if (!_formKey.currentState.validate() && _formData['acceptTerms']) {
+      return;
     }
+    _formKey.currentState.save();
+    Navigator.pushReplacementNamed(context, "/products");
   }
 
   @override
