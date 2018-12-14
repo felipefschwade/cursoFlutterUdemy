@@ -97,11 +97,9 @@ class _ProductEditState extends State<ProductEditPage> {
       widget.updateProduct(widget.index, _formData);
     }
     Navigator.pushReplacementNamed(context, '/products');
-
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildPageContent(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 768.0 ? 500.0 : MediaQuery.of(context).size.width * 0.85;
     final double targetPadding = deviceWidth - targetWidth;
@@ -130,7 +128,13 @@ class _ProductEditState extends State<ProductEditPage> {
         ),
       ),
     );
+    return content;
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    Widget content = _buildPageContent(context);
     return widget.product == null ? content : Scaffold(appBar: AppBar(title: Text('Edit Product')), body: content,);
   }
+
 }

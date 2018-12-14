@@ -79,7 +79,7 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   void _sendForm() {
-    if (!_formData['acceptTerms']) setState(() => _color = Colors.red);
+    !_formData['acceptTerms'] ? setState(() => _color = Colors.red) : setState(() => _color = Colors.white);
     if (_formKey.currentState.validate() && _formData['acceptTerms']) {
       _formKey.currentState.save();
       Navigator.pushReplacementNamed(context, "/products");
