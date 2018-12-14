@@ -18,10 +18,17 @@ class _AppState extends State<App> {
   List<Map<String, dynamic>> _products = [];
 
   void _addProduct(Map<String, dynamic> product) {
-      this.setState(() {
-        _products.add(product);
-      });
+    this.setState(() {
+      _products.add(product);
+    });
   }
+
+   void _updateProduct(int index, Map<String, dynamic> product) {
+    this.setState(() {
+      _products[index] = (product);
+    });
+  }
+
 
   void _deleteProduct(int index) {
     this.setState(() {
@@ -49,7 +56,7 @@ class _AppState extends State<App> {
       home: AuthPage(),
       routes: {
         '/products' : (BuildContext context) => ProductsPage(_products),
-        '/admin' : (BuildContext context) => AdminPage(_addProduct, _deleteProduct, _products),
+        '/admin' : (BuildContext context) => AdminPage(_addProduct, _updateProduct, _deleteProduct, _products),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
