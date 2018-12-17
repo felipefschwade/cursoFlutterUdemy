@@ -1,9 +1,10 @@
 import 'package:curso_udemy/drawer.dart';
+import 'package:curso_udemy/models/product.dart';
 import 'package:curso_udemy/widgets/products/products.dart';
 import 'package:flutter/material.dart';
 
 class ProductsPage extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+  final List<Product> products;
 
   ProductsPage(this.products);
   @override

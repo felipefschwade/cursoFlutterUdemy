@@ -1,3 +1,4 @@
+import 'package:curso_udemy/models/product.dart';
 import 'package:curso_udemy/pages/admin_page.dart';
 import 'package:curso_udemy/pages/auth.dart';
 import 'package:curso_udemy/pages/product.dart';
@@ -15,27 +16,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  List<Map<String, dynamic>> _products = [];
-
-  void _addProduct(Map<String, dynamic> product) {
-    this.setState(() {
-      _products.add(product);
-    });
-  }
-
-   void _updateProduct(int index, Map<String, dynamic> product) {
-    this.setState(() {
-      _products[index] = (product);
-    });
-  }
-
-
-  void _deleteProduct(int index) {
-    this.setState(() {
-      _products.removeAt(index);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -67,11 +47,11 @@ class _AppState extends State<App> {
           final int index = int.parse(pathElements[2]);
           return MaterialPageRoute<bool>(
             builder: (BuildContext context) => ProductPage(
-              title: _products[index]['title'], 
-              imageUrl: _products[index]['image'],
+              title: _products[index].title, 
+              imageUrl: _products[index].image,
               address: 'Union Square - San Francisco',
-              description: _products[index]['description'],
-              price: _products[index]['price'],)
+              description: _products[index].description,
+              price: _products[index].price,)
           );
         }
         return null;

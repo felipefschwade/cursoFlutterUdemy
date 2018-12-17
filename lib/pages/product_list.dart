@@ -1,15 +1,16 @@
+import 'package:curso_udemy/models/product.dart';
 import 'package:curso_udemy/pages/product_edit.dart';
 import 'package:flutter/material.dart';
 
 class ProductListPage extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+  final List<Product> products;
   final Function updateProduct;
   final Function deleteProduct;
 
   ProductListPage(this.products, this.updateProduct, this.deleteProduct);
 
   Widget _buildEditButton(BuildContext context, int index) {
-    IconButton(
+    return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
         Navigator.of(context).push(
@@ -45,11 +46,11 @@ class ProductListPage extends StatelessWidget {
             key: UniqueKey(),
             child: Column(children: <Widget>[
               ListTile(
-                title: Text(products[index]['title']),
+                title: Text(products[index].title),
                 leading: CircleAvatar(
-                  backgroundImage: AssetImage(products[index]['image']),
+                  backgroundImage: AssetImage(products[index].image),
                 ),
-                subtitle: Text('\$ ${products[index]['price'].toString()}'),
+                subtitle: Text('\$ ${products[index].price.toString()}'),
                 trailing: _buildEditButton(context, index),
               ),
               Divider()
