@@ -1,15 +1,14 @@
+import 'package:curso_udemy/models/product.dart';
+import 'package:curso_udemy/scoped_models/products.dart';
 import 'package:curso_udemy/widgets/ui_elements/title.dart';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class ProductPage extends StatelessWidget {
 
-  final String title;
-  final String imageUrl;
-  final double price;
-  final String description;
-  final String address;
+  final int index;
 
-  ProductPage({this.title, this.imageUrl, this.address, this.description, this.price});
+  ProductPage(this.index);
 
   void _showWarningDialog(BuildContext context) {
     showDialog(context: context, builder: (BuildContext builder) {
@@ -37,43 +36,47 @@ class ProductPage extends StatelessWidget {
         Navigator.pop(context, false);
         return Future.value(false);
       },
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text(title),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.red,
-          child: Icon(Icons.delete_forever),
-          onPressed: () => _showWarningDialog(context),
-        ),
-        body: Column(
-          children: <Widget>[
-            Image.asset(imageUrl),
-            SizedBox(height: 10.0),
-            PersonalTitle(title),
-            SizedBox(height: 10.0),
-            Text(
-              '${address} | \$ ${price}',
-              style: TextStyle(
-                color: Colors.grey[800],
-                fontSize: 12.0
-              ),
-            ),
-            SizedBox(height: 10.0),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: Text(
-                description,
+      child: ScopedModelDescendant<ProductsModel>(
+      builder: (BuildContext context, Widget child, ProductsModel model) {
+        final Product product = model.products[index];
+        return Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text(product.title),
+          ),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.red,
+            child: Icon(Icons.delete_forever),
+            onPressed: () => _showWarningDialog(context),
+          ),
+          body: Column(
+            children: <Widget>[
+              Image.asset(product.image),
+              SizedBox(height: 10.0),
+              PersonalTitle(product.title),
+              SizedBox(height: 10.0),
+              Text(
+                'Endereço louco | \$ ${product.price}',
                 style: TextStyle(
-                  fontSize: 18.0,
+                  color: Colors.grey[800],
+                  fontSize: 12.0
                 ),
-                textAlign: TextAlign.center,
               ),
-            )
-          ],
-        ),
-      ),
+              SizedBox(height: 10.0),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(
+                  product.description,
+                  style: TextStyle(
+                    fontSize: 18.0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              )
+            ],
+          ),
+        );
+      }),
     );
   }
 
