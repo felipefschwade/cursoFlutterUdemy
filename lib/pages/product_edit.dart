@@ -4,13 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductEditPage extends StatefulWidget {
-  final Function addProduct;
-  final Function updateProduct;
-  final Product product;
-  final int index;
-
-  ProductEditPage({this.addProduct, this.index, this.product, this.updateProduct});
-
   @override
   State<StatefulWidget> createState() {
     return _ProductEditState();
@@ -27,10 +20,10 @@ class _ProductEditState extends State<ProductEditPage> {
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   
-  Widget _buildTitleTextField() {
+  Widget _buildTitleTextField(Product product) {
     return TextFormField(
       autovalidate: true,
-      initialValue: widget.product == null ? '' : widget.product.title,
+      initialValue: product == null ? '' : product.title,
       decoration: InputDecoration(
         labelText: 'Product Title',
         icon: Icon(Icons.perm_identity),
@@ -46,9 +39,9 @@ class _ProductEditState extends State<ProductEditPage> {
     );
   }
 
-  Widget _buildDescriptionTextField() {
+  Widget _buildDescriptionTextField(Product product) {
     return TextFormField(
-      initialValue: widget.product == null ? '' : widget.product.description,
+      initialValue: product == null ? '' : product.description,
       autovalidate: true,
         decoration: InputDecoration(
         labelText: 'Product Description',
@@ -67,9 +60,9 @@ class _ProductEditState extends State<ProductEditPage> {
     );
   }
 
-  Widget _buildPriceTextField() {
+  Widget _buildPriceTextField(Product product) {
     return TextFormField(
-      initialValue: widget.product == null ? '' : widget.product.price.toString(),
+      initialValue: product == null ? '' : product.price.toString(),
       autovalidate: true,
       decoration: InputDecoration(
         labelText: 'Product price',
@@ -90,11 +83,11 @@ class _ProductEditState extends State<ProductEditPage> {
     );
   }
 
-  void _submitForm(Function addProduct, Function updateProduct) {
+  void _submitForm(Function addProduct, Function updateProduct, [int selectedProductIndex]) {
     // Usage without autovalidate.
     // if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
-    if (widget.product == null) {
+    if (selectedProductIndex == null) {
       addProduct(
         Product(
           title: _formData['title'],
@@ -105,7 +98,6 @@ class _ProductEditState extends State<ProductEditPage> {
       );
     } else {
       updateProduct(
-        widget.index, 
         Product(
           title: _formData['title'],
           description: _formData['description'],
@@ -117,7 +109,7 @@ class _ProductEditState extends State<ProductEditPage> {
     Navigator.pushReplacementNamed(context, '/products');
   }
 
-  Widget _buildPageContent(BuildContext context) {
+  Widget _buildPageContent(BuildContext context, Product product) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 768.0 ? 500.0 : MediaQuery.of(context).size.width * 0.85;
     final double targetPadding = deviceWidth - targetWidth;
@@ -132,9 +124,9 @@ class _ProductEditState extends State<ProductEditPage> {
           child: ListView(
             padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
             children: <Widget>[
-              _buildTitleTextField(),
-              _buildDescriptionTextField(),
-              _buildPriceTextField(),
+              _buildTitleTextField(product),
+              _buildDescriptionTextField(product),
+              _buildPriceTextField(product),
               SizedBox(height:  10.0),
               _buildSubmitButton(),
             ]
@@ -151,7 +143,7 @@ class _ProductEditState extends State<ProductEditPage> {
         return RaisedButton(
           child: Text('Save'),
           textColor: Colors.white,
-          onPressed: () => _submitForm(model.addProduct, model.updateProduct),
+          onPressed: () => _submitForm(model.addProduct, model.updateProduct, model.selectedProductIndex),
         );
       }
     );
@@ -159,8 +151,12 @@ class _ProductEditState extends State<ProductEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = _buildPageContent(context);
-    return widget.product == null ? content : Scaffold(appBar: AppBar(title: Text('Edit Product')), body: content,);
+    return ScopedModelDescendant<ProductsModel>(
+      builder: (BuildContext context, Widget child, ProductsModel model) {
+        final Widget content = _buildPageContent(context, model.selectedProduct);
+        return model.selectedProductIndex == null ? content : Scaffold(appBar: AppBar(title: Text('Edit Product')), body: content,);
+      }
+    );
   }
 
 }
