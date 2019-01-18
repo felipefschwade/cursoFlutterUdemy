@@ -5,6 +5,30 @@ import 'package:scoped_model/scoped_model.dart';
 
 class ProductListPage extends StatelessWidget {
 
+
+  void _showWarningDialog(BuildContext context, ProductsModel model, int index) {
+    showDialog(context: context, builder: (BuildContext builder) {
+      return AlertDialog(
+        title: Text('Are you sure?'),
+        content: Text("This change can't be undone."),
+        actions: <Widget>[
+          FlatButton(child: Text('Discard'), onPressed: () {
+            Navigator.pop(context);
+            model.notifyListeners(); 
+          }),
+          FlatButton(
+            child: Text('Delete'), 
+            onPressed: () {
+              model.selectProduct(index);
+              model.deleteProduct();
+              Navigator.pop(context);
+            }
+          ),
+        ],
+      );
+    }); 
+  }
+
   Widget _buildEditButton(BuildContext context, int index, ProductsModel model) {
     return IconButton(
       icon: Icon(Icons.edit),
@@ -40,8 +64,7 @@ class ProductListPage extends StatelessWidget {
                   ),
                 ),
                 onDismissed: (DismissDirection direction) {
-                  model.selectProduct(index);
-                  model.deleteProduct();
+                  _showWarningDialog(context, model, index);
                 },
                 key: UniqueKey(),
                 child: Column(children: <Widget>[

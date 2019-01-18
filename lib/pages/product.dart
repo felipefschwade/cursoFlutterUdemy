@@ -10,44 +10,15 @@ class ProductPage extends StatelessWidget {
 
   ProductPage(this.index);
 
-  void _showWarningDialog(BuildContext context) {
-    showDialog(context: context, builder: (BuildContext builder) {
-      return AlertDialog(
-        title: Text('Are you sure?'),
-        content: Text("This change can't be undone."),
-        actions: <Widget>[
-          FlatButton(child: Text('Discard'), onPressed: () => Navigator.pop(context)),
-          FlatButton(
-            child: Text('Delete'), 
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context, true); 
-            }
-          ),
-        ],
-      );
-    }); 
-  }
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        Navigator.pop(context, false);
-        return Future.value(false);
-      },
-      child: ScopedModelDescendant<ProductsModel>(
+    return ScopedModelDescendant<ProductsModel>(
       builder: (BuildContext context, Widget child, ProductsModel model) {
         final Product product = model.products[index];
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
             title: Text(product.title),
-          ),
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.red,
-            child: Icon(Icons.delete_forever),
-            onPressed: () => _showWarningDialog(context),
           ),
           body: Column(
             children: <Widget>[
@@ -76,7 +47,7 @@ class ProductPage extends StatelessWidget {
             ],
           ),
         );
-      }),
+      }
     );
   }
 
