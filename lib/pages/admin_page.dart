@@ -1,5 +1,4 @@
 import 'package:curso_udemy/drawer.dart';
-import 'package:curso_udemy/models/product.dart';
 import 'package:curso_udemy/pages/product_edit.dart';
 import 'package:curso_udemy/pages/product_list.dart';
 import 'package:flutter/material.dart';

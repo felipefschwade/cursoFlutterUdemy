@@ -1,12 +1,12 @@
 import 'package:curso_udemy/pages/product_edit.dart';
-import 'package:curso_udemy/scoped_models/products.dart';
+import 'package:curso_udemy/scoped_models/main.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductListPage extends StatelessWidget {
 
 
-  void _showWarningDialog(BuildContext context, ProductsModel model, int index) {
+  void _showWarningDialog(BuildContext context, MainModel model, int index) {
     showDialog(context: context, builder: (BuildContext builder) {
       return AlertDialog(
         title: Text('Are you sure?'),
@@ -29,7 +29,7 @@ class ProductListPage extends StatelessWidget {
     }); 
   }
 
-  Widget _buildEditButton(BuildContext context, int index, ProductsModel model) {
+  Widget _buildEditButton(BuildContext context, int index, MainModel model) {
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
@@ -46,8 +46,8 @@ class ProductListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return ListView.builder(
           itemCount: model.products.length,
           itemBuilder: (BuildContext context, int index) {
