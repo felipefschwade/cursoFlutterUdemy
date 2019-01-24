@@ -49,9 +49,9 @@ class ProductListPage extends StatelessWidget {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         return ListView.builder(
-          itemCount: model.products.length,
+          itemCount: model.allProducts.length,
           itemBuilder: (BuildContext context, int index) {
-            if (model.products.length > 0) {
+            if (model.allProducts.length > 0) {
               return Dismissible(
                 background: Container(
                   color: Colors.red,
@@ -69,11 +69,11 @@ class ProductListPage extends StatelessWidget {
                 key: UniqueKey(),
                 child: Column(children: <Widget>[
                   ListTile(
-                    title: Text(model.products[index].title),
+                    title: Text(model.allProducts[index].title),
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage(model.products[index].image),
+                      backgroundImage: AssetImage(model.allProducts[index].image),
                     ),
-                    subtitle: Text('\$ ${model.products[index].price.toString()}'),
+                    subtitle: Text('\$ ${model.allProducts[index].price.toString()}'),
                     trailing: _buildEditButton(context, index, model),
                   ),
                   Divider()

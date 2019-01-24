@@ -89,21 +89,17 @@ class _ProductEditState extends State<ProductEditPage> {
     _formKey.currentState.save();
     if (selectedProductIndex == null) {
       addProduct(
-        Product(
-          title: _formData['title'],
-          description: _formData['description'],
-          image: 'assets/food.jpg',
-          price: _formData['price']
-        )
+        _formData['title'],
+        _formData['price'],
+        _formData['description'],
+        'assets/food.jpg',
       );
     } else {
       updateProduct(
-        Product(
-          title: _formData['title'],
-          description: _formData['description'],
-          image: 'assets/food.jpg',
-          price: _formData['price']
-        )
+          _formData['title'],
+          _formData['description'],
+          _formData['price'],
+          'assets/food.jpg',
       );
     }
     Navigator.pushReplacementNamed(context, '/products');
