@@ -90,8 +90,8 @@ class _ProductEditState extends State<ProductEditPage> {
     if (selectedProductIndex == null) {
       addProduct(
         _formData['title'],
-        _formData['price'],
         _formData['description'],
+        _formData['price'],
         'assets/food.jpg',
       );
     } else {
