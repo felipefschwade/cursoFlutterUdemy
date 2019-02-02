@@ -39,7 +39,7 @@ class ProductListPage extends StatelessWidget {
             builder: (BuildContext context) {
               return ProductEditPage();
           }
-        ));
+        )).then((_) => model.selectProduct(null));
       },
     );
   }

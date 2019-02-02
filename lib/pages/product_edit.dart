@@ -83,9 +83,9 @@ class _ProductEditState extends State<ProductEditPage> {
     );
   }
 
-  void _submitForm(Function addProduct, Function updateProduct, [int selectedProductIndex]) {
+  void _submitForm(Function addProduct, Function updateProduct, Function setSelectedProduct, [int selectedProductIndex]) {
     // Usage without autovalidate.
-    // if (!_formKey.currentState.validate()) return;
+    if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
     if (selectedProductIndex == null) {
       addProduct(
@@ -102,7 +102,8 @@ class _ProductEditState extends State<ProductEditPage> {
           'assets/food.jpg',
       );
     }
-    Navigator.pushReplacementNamed(context, '/products');
+    Navigator.pushReplacementNamed(context, '/products')
+    .then((_) => setSelectedProduct(null));
   }
 
   Widget _buildPageContent(BuildContext context, Product product) {
@@ -139,7 +140,7 @@ class _ProductEditState extends State<ProductEditPage> {
         return RaisedButton(
           child: Text('Save'),
           textColor: Colors.white,
-          onPressed: () => _submitForm(model.addProduct, model.updateProduct, model.selectedProductIndex),
+          onPressed: () => _submitForm(model.addProduct, model.updateProduct, model.selectProduct, model.selectedProductIndex),
         );
       }
     );

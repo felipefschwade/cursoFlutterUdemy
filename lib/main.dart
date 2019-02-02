@@ -3,7 +3,6 @@ import 'package:curso_udemy/pages/auth.dart';
 import 'package:curso_udemy/pages/product.dart';
 import 'package:curso_udemy/pages/products_page.dart';
 import 'package:curso_udemy/scoped_models/main.dart';
-import 'package:curso_udemy/scoped_models/products.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
