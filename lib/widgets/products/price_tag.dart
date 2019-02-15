@@ -8,7 +8,6 @@ class PriceTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
       decoration: BoxDecoration(

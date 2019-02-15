@@ -1,6 +1,7 @@
 import 'package:curso_udemy/pages/admin_page.dart';
 import 'package:curso_udemy/pages/auth.dart';
 import 'package:curso_udemy/pages/product.dart';
+import 'models/product.dart';
 import 'package:curso_udemy/pages/products_page.dart';
 import 'package:curso_udemy/scoped_models/main.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +20,9 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
+    final model = MainModel();
     return ScopedModel<MainModel>( 
-      model: MainModel(),
+      model: model,
       child: MaterialApp(
         theme: ThemeData(
           brightness: Brightness.light,
@@ -38,8 +40,8 @@ class _AppState extends State<App> {
         ),
         home: AuthPage(),
         routes: {
-          '/products' : (BuildContext context) => ProductsPage(),
-          '/admin' : (BuildContext context) => AdminPage(),
+          '/products' : (BuildContext context) => ProductsPage(model),
+          '/admin' : (BuildContext context) => AdminPage(model),
         },
         onGenerateRoute: (RouteSettings settings) {
           final List<String> pathElements = settings.name.split('/');
@@ -47,15 +49,16 @@ class _AppState extends State<App> {
             return null;
           }
           if (pathElements[1] == 'product') {
-            final int index = int.parse(pathElements[2]);
+            final String productId =  pathElements[2];
+            final product = model.allProducts.firstWhere((Product p) => p.id == productId);
             return MaterialPageRoute<bool>(
-              builder: (BuildContext context) => ProductPage(index)
+              builder: (BuildContext context) => ProductPage(product)
             );
           }
           return null;
         },
         onUnknownRoute: (RouteSettings settings) {
-          return MaterialPageRoute(builder: (BuildContext context) => ProductsPage());
+          return MaterialPageRoute(builder: (BuildContext context) => ProductsPage(model));
         },
       ),
     );

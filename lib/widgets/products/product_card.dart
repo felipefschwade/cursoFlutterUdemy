@@ -28,28 +28,29 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    return ButtonBar(
-      alignment: MainAxisAlignment.center,
-      children: <Widget>[
-        IconButton(
-          color: Theme.of(context).primaryColor,
-          icon: Icon(Icons.info),
-          iconSize: 40.0,
-          onPressed: () => Navigator.pushNamed<bool>(context, '/product/${index.toString()}')
-        ),
-        ScopedModelDescendant<MainModel>(
-          builder: (BuildContext context, Widget child, MainModel model) {
-            return IconButton(
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        return ButtonBar(
+          alignment: MainAxisAlignment.center,
+          children: <Widget>[
+            IconButton(
+              color: Theme.of(context).primaryColor,
+              icon: Icon(Icons.info),
+              iconSize: 40.0,
+              onPressed: () => Navigator.pushNamed<bool>(context, '/product/${model.allProducts[index].id}')
+            ),
+            IconButton(
               icon: Icon(model.allProducts[index].isFavorite ? Icons.favorite : Icons.favorite_border),
               color: Colors.red,
               onPressed: () {
-                model.selectProduct(index);
+                model.selectProduct(model.allProducts[index].id);
                 model.toggleProductFavoriteStatus();
               },
-            );
-          }
-        ),
-      ],
+            ),
+          ],
+        );
+      },
+      
     );
   }
 
@@ -59,14 +60,19 @@ class ProductCard extends StatelessWidget {
     return Card(
       child: Column(
         children: <Widget>[
-          Image.asset(product.image),
+          FadeInImage(
+            image: NetworkImage(product.image), 
+            placeholder: AssetImage('assets/background.jpg'),
+            height: 300.0,
+            fit: BoxFit.cover,
+          ),
           _buildPriceRow(),
           ProductTag('Union Square - San Francisco'),
           Text(product.userEmail),
           Text(product.description),
           _buildActionButtons(context),
         ]),
-    );;
+    );
   }
 
 }

@@ -87,23 +87,29 @@ class _ProductEditState extends State<ProductEditPage> {
     // Usage without autovalidate.
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
-    if (selectedProductIndex == null) {
+    print(selectedProductIndex);
+    if (selectedProductIndex == -1) {
       addProduct(
         _formData['title'],
         _formData['description'],
         _formData['price'],
         'assets/food.jpg',
-      );
+      ).then((bool success) {
+        if (success) Navigator.pushReplacementNamed(context, '/products').then((_) => setSelectedProduct(null));
+        else Scaffold.of(context).showSnackBar(SnackBar(content: Text('Something went wrong! Please try again later.')));
+      });
     } else {
       updateProduct(
           _formData['title'],
           _formData['description'],
           _formData['price'],
           'assets/food.jpg',
-      );
+      ).then((bool success) {
+        if (success) Navigator.pushReplacementNamed(context, '/products').then((_) => setSelectedProduct(null));
+        else Scaffold.of(context).showSnackBar(SnackBar(content: Text('Something went wrong! Please try again later.')));
+      });
     }
-    Navigator.pushReplacementNamed(context, '/products')
-    .then((_) => setSelectedProduct(null));
+    
   }
 
   Widget _buildPageContent(BuildContext context, Product product) {
@@ -130,14 +136,14 @@ class _ProductEditState extends State<ProductEditPage> {
           ),
         ),
       ),
-    );
+    ); 
     return content;
   }
 
   Widget _buildSubmitButton() {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return RaisedButton(
+        return model.isLoading ? Center(child: CircularProgressIndicator()) : RaisedButton(
           child: Text('Save'),
           textColor: Colors.white,
           onPressed: () => _submitForm(model.addProduct, model.updateProduct, model.selectProduct, model.selectedProductIndex),
@@ -151,7 +157,7 @@ class _ProductEditState extends State<ProductEditPage> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         final Widget content = _buildPageContent(context, model.selectedProduct);
-        return model.selectedProductIndex == null ? content : Scaffold(appBar: AppBar(title: Text('Edit Product')), body: content,);
+        return model.selectedProductIndex == -1 ? content : Scaffold(appBar: AppBar(title: Text('Edit Product')), body: content,);
       }
     );
   }

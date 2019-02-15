@@ -3,8 +3,26 @@ import 'package:curso_udemy/scoped_models/main.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class ProductListPage extends StatelessWidget {
+class ProductListPage extends StatefulWidget { 
 
+  final MainModel model;
+
+  ProductListPage(this.model);
+
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return _ProductsLisState();
+  }
+}
+
+class _ProductsLisState extends State<ProductListPage> {
+
+  @override
+  void initState() {
+    widget.model.fetchProducts();
+    super.initState();
+  }
 
   void _showWarningDialog(BuildContext context, MainModel model, int index) {
     showDialog(context: context, builder: (BuildContext builder) {
@@ -14,14 +32,16 @@ class ProductListPage extends StatelessWidget {
         actions: <Widget>[
           FlatButton(child: Text('Discard'), onPressed: () {
             Navigator.pop(context);
-            model.notifyListeners(); 
           }),
           FlatButton(
             child: Text('Delete'), 
             onPressed: () {
-              model.selectProduct(index);
-              model.deleteProduct();
-              Navigator.pop(context);
+              model.selectProduct(model.allProducts[index].id);
+              model.deleteProduct()
+              .then((bool success) {
+                if (success) Navigator.pop(context);
+                else Scaffold.of(context).showSnackBar(SnackBar(content: Text('Something went wrong! Please try again later.')));
+              });              
             }
           ),
         ],
@@ -33,7 +53,7 @@ class ProductListPage extends StatelessWidget {
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
-        model.selectProduct(index);
+        model.selectProduct(model.allProducts[index].id);
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (BuildContext context) {
@@ -71,7 +91,7 @@ class ProductListPage extends StatelessWidget {
                   ListTile(
                     title: Text(model.allProducts[index].title),
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage(model.allProducts[index].image),
+                      backgroundImage: NetworkImage(model.allProducts[index].image),
                     ),
                     subtitle: Text('\$ ${model.allProducts[index].price.toString()}'),
                     trailing: _buildEditButton(context, index, model),

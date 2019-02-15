@@ -7,24 +7,39 @@ import 'dart:convert';
 import 'dart:async';
 mixin ConnectedProducts on Model {
   List<Product> _products = [];
+  bool _isLoading = false;
   User _authUser;
-  int _selProductIndex;
+  String _selProductId;
 
-  void addProduct(String title, String description, double price, String image) async {
+  Future<bool> addProduct(String title, String description, double price, String image) async {
+    _isLoading = true;
+    notifyListeners();
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
+      'price': price,
       'image': 'http://www.luisaabram.com.br/wp-content/uploads/2016/02/ochocolate_barra01-600x478.jpg',
-      'price': price
+      'userId': _authUser.id,
+      'userEmail': _authUser.email
     };
-    http.post('https://flutter-products-fcae1.firebaseio.com/products.json', body: json.encode(productData))
+    return http.post('https://flutter-products-fcae1.firebaseio.com/products.json', body: json.encode(productData))
     .then((Response res) {
-      print(res);
+      if (res.statusCode != 200 && res.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
       final Map<String, dynamic> responseData = json.decode(res.body);
-      final Product product = Product(title: title, description: description, image: image, price: price, userEmail: _authUser.email, userId: _authUser.id);
+      final Product product = Product(id: responseData['name'], title: title, description: description, image: image, price: price, userEmail: _authUser.email, userId: _authUser.id);
       _products.add(product);
-      _selProductIndex = null;
+      _selProductId = null;
       notifyListeners();
+      return true;
+    })
+    .catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 }
@@ -37,6 +52,10 @@ mixin ProductsModel on ConnectedProducts {
     return _showFavorites;
   }
 
+  int get selectedProductIndex {
+    return _products.indexWhere((Product p) => p.id == _selProductId);
+  }
+
   List<Product> get allProducts {
     return List.from(_products);
   }
@@ -47,41 +66,121 @@ mixin ProductsModel on ConnectedProducts {
   }
 
   Product get selectedProduct {
-    if (_selProductIndex == null) return null;
-    return _products[_selProductIndex];
+    if (_selProductId == null) return null;
+    return _products.firstWhere((Product p) => p.id == _selProductId);
   }
 
-  int get selectedProductIndex {
-    return _selProductIndex;
+  String get selectedProductId {
+    return _selProductId;
   }
 
-   void updateProduct(String title, String description, double price, String image, {bool isFavorite = false}) {
-    _products[_selProductIndex] = Product(title: title, description: description, image: image, price: price, isFavorite: isFavorite, userEmail: selectedProduct.userEmail, userId: selectedProduct.userId);
+   Future<bool> updateProduct(String title, String description, double price, String image, {bool isFavorite = false}) {
+    _isLoading = true;
     notifyListeners();
+    final Map<String, dynamic> updateData = {
+      'title': title,
+      'description': description,
+      'price': price,
+      'image': 'http://www.luisaabram.com.br/wp-content/uploads/2016/02/ochocolate_barra01-600x478.jpg',
+      'userId': _authUser.id,
+      'userEmail': _authUser.email      
+    };
+    return http.put('https://flutter-products-fcae1.firebaseio.com/products/${selectedProduct.id}.json', body: json.encode(updateData))
+    .then((Response resp) {
+      _isLoading = false;
+      _products[selectedProductIndex] = Product(
+        id: selectedProduct.id,
+        title: title, 
+        description: description,
+        image: image,
+        price: price,
+        isFavorite: isFavorite,
+        userEmail: selectedProduct.userEmail,
+        userId: selectedProduct.userId);
+      notifyListeners();
+      return true;
+    })
+    .catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
   }
 
   void toggleProductFavoriteStatus() {
     final bool currentlyFavorite = selectedProduct.isFavorite;
     final bool newFavoriteStatus = !currentlyFavorite;
-    updateProduct(
-      selectedProduct.title,
-      selectedProduct.description,
-      selectedProduct.price,
-      selectedProduct.image,
-      isFavorite: newFavoriteStatus);
+    _products[selectedProductIndex] = Product(
+        id: selectedProduct.id,
+        title: selectedProduct.title, 
+        description: selectedProduct.description,
+        image: selectedProduct.image,
+        price: selectedProduct.price,
+        isFavorite: newFavoriteStatus,
+        userEmail: selectedProduct.userEmail,
+        userId: selectedProduct.userId);
     notifyListeners();
+    _selProductId = null;
   }
 
-  void deleteProduct() {  
+  Future<bool> deleteProduct() {
+    _isLoading = true;
     _products.removeAt(selectedProductIndex);
     notifyListeners();
+    return http.delete("https://flutter-products-fcae1.firebaseio.com/products/${_selProductId}.json")
+    .then((Response resp) {
+      _selProductId = null;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    })
+    .catchError((error) {
+      _selProductId = null;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
   }
 
-  void selectProduct(int index) {
-    _selProductIndex = index;
-    if (index != null) {
+  Future<Null> fetchProducts() {
+    _isLoading = true;
+    return http.get('https://flutter-products-fcae1.firebaseio.com/products.json')
+    .then<Null>((Response res) {
+      final List<Product> fetchedProducts = [];
+      final Map<String, dynamic> productListData = json.decode(res.body);
+      if (productListData == null) {
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      productListData.forEach((String productId, dynamic item) {
+        final Product product = Product(
+          id: productId,
+          description: item['description'],
+          image: item['image'],
+          price: item['price'],
+          title: item['title'],
+          userEmail: item['userEmail'],
+          userId: item['userId']
+        );
+        fetchedProducts.add(product);
+      });
+      _products = fetchedProducts;
+      _isLoading = false;
       notifyListeners();
-    }
+      _selProductId = null;
+      return;
+    })
+    .catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return;
+    });
+  }
+
+  void selectProduct(String productId) {
+    _selProductId = productId;
+    notifyListeners();
   }
 
   void toggleDisplayMode() {
@@ -94,5 +193,11 @@ mixin UserModel on ConnectedProducts {
   void login(String email, String password)
   {
     _authUser = User(id: 'asdasdasd', email: email, password: password);
+  }
+}
+
+mixin UtilityModel on ConnectedProducts {
+  bool get isLoading {
+    return _isLoading;
   }
 }
