@@ -1,11 +1,7 @@
 import 'package:curso_udemy/scoped_models/main.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-
-enum AuthMode {
-  Signup,
-  Login
-}
+import 'package:curso_udemy/models/auth.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -121,16 +117,11 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _sendForm(Function loginFunction, Function signUpFunction) async {
+  void _sendForm(Function authenticationFunc) async {
     !_formData['acceptTerms'] ? setState(() => _color = Colors.red) : setState(() => _color = Colors.white);
     if (_formKey.currentState.validate() && _formData['acceptTerms']) {
       _formKey.currentState.save();
-      Map<String, dynamic> responseInfo;
-      if (_authMode == AuthMode.Login) {
-        responseInfo = await loginFunction(_formData['email'], _formData['password']);
-      } else {
-        responseInfo = await signUpFunction(_formData['email'], _formData['password']);
-      }
+      final Map<String, dynamic> responseInfo = await authenticationFunc(_formData['email'], _formData['password'], _authMode);
       if (responseInfo['success']) Navigator.pushReplacementNamed(context, "/products");
       else _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(responseInfo['message'])));
     }
@@ -179,7 +170,7 @@ class _AuthPageState extends State<AuthPage> {
                           return RaisedButton(
                             child: Text(_authMode == AuthMode.Login ? 'Login' : 'Sign Up'),
                             textColor: Colors.white,
-                            onPressed: () => _sendForm(model.login, model.signUp),
+                            onPressed: () => _sendForm(model.authenticate),
                           );
                         }
                       ),

@@ -5,6 +5,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:curso_udemy/models/auth.dart';
 mixin ConnectedProducts on Model {
   List < Product > _products = [];
   bool _isLoading = false;
@@ -192,18 +193,27 @@ mixin ProductsModel on ConnectedProducts {
 }
 
 mixin UserModel on ConnectedProducts {
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<Map<String, dynamic>> authenticate(String email, String password, [AuthMode mode = AuthMode.Login]) async {
     try {
       _isLoading = true;
       final Map<String, String> formData = {
         'email': email,
         'password': password,
       };
-      final Response response = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyBZYJ9zzu_XeC9hZrbOqXyIa7iEhCfbHj8',
-        body: json.encode(formData),
-        headers: {'Content-Type': 'application/json'}
-      );
+      Response response;
+      if (mode == AuthMode.Login) {
+        response = await http.post(
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyBZYJ9zzu_XeC9hZrbOqXyIa7iEhCfbHj8',
+          body: json.encode(formData),
+          headers: {'Content-Type': 'application/json'}
+        );
+      } else {
+        response = await http.post(
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBZYJ9zzu_XeC9hZrbOqXyIa7iEhCfbHj8',
+          body: json.encode(formData),
+          headers: {'Content-Type': 'application/json'}
+        );
+      }
       final Map<String, dynamic> responseData = json.decode(response.body);
       _isLoading = false;
       notifyListeners();
@@ -211,6 +221,7 @@ mixin UserModel on ConnectedProducts {
         String message = 'Ops, something went wrong!';
         if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') message = 'This email was not found.';
         else if (responseData['error']['message'] == 'INVALID_PASSWORD') message = 'The password is invalid.';
+        else if (responseData['error']['message'] == 'EMAIL_EXISTS') message = 'This email already exists.';
         return {'success': false, 'message': message};
       }
       return {'success': true, 'message': 'Authentication Succeeded!'}; 
@@ -220,36 +231,6 @@ mixin UserModel on ConnectedProducts {
       return {'success': false, 'message': 'Ops, something went wrong!'}; 
     }
   }
-
-  Future<Map<String, dynamic>> signUp(String email, String password) async {
-    _isLoading = true;
-    notifyListeners();
-    final Map<String, String> formData = {
-      'email': email,
-      'password': password,
-    };
-    try {
-      final Response response = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBZYJ9zzu_XeC9hZrbOqXyIa7iEhCfbHj8',
-        body: json.encode(formData),
-        headers: {'Content-Type': 'application/json'}
-      );
-      _isLoading = false;
-      notifyListeners();
-      final Map<String, dynamic> responseData =json.decode(response.body);
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        String message = 'Ops, something went wrong!';
-        if (responseData['error']['message'] == 'EMAIL_EXISTS') message = 'This email already exists.';
-        return {'success': false, 'message': message};
-      }
-      return {'success': true, 'message': 'Authentication Succeeded!'}; 
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      return {'success': false, 'message': 'Ops, something went wrong!'}; 
-    }
-  }
-
 }
 
 mixin UtilityModel on ConnectedProducts {
