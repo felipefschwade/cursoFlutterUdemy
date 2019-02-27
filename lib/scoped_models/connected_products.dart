@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:curso_udemy/models/auth.dart';
+import 'package:dotenv/dotenv.dart';
+
 mixin ConnectedProducts on Model {
   List < Product > _products = [];
   bool _isLoading = false;
@@ -203,13 +205,12 @@ mixin UserModel on ConnectedProducts {
       Response response;
       if (mode == AuthMode.Login) {
         response = await http.post(
-          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyBZYJ9zzu_XeC9hZrbOqXyIa7iEhCfbHj8',
-          body: json.encode(formData),
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${env['apiKey']}',
           headers: {'Content-Type': 'application/json'}
         );
       } else {
         response = await http.post(
-          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBZYJ9zzu_XeC9hZrbOqXyIa7iEhCfbHj8',
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${env['apiKey']}',
           body: json.encode(formData),
           headers: {'Content-Type': 'application/json'}
         );
