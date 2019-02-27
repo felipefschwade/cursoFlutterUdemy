@@ -83,21 +83,24 @@ class _ProductEditState extends State<ProductEditPage> {
     );
   }
 
-  void _submitForm(Function addProduct, Function updateProduct, Function setSelectedProduct, [int selectedProductIndex]) {
+  void _submitForm(Function addProduct, Function updateProduct, Function setSelectedProduct, [int selectedProductIndex]) async {
     // Usage without autovalidate.
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
     print(selectedProductIndex);
     if (selectedProductIndex == -1) {
-      addProduct(
-        _formData['title'],
-        _formData['description'],
-        _formData['price'],
-        'assets/food.jpg',
-      ).then((bool success) {
+      try {
+        final bool success = await addProduct(
+          _formData['title'],
+          _formData['description'],
+          _formData['price'],
+          'assets/food.jpg',
+        );
         if (success) Navigator.pushReplacementNamed(context, '/products').then((_) => setSelectedProduct(null));
         else Scaffold.of(context).showSnackBar(SnackBar(content: Text('Something went wrong! Please try again later.')));
-      });
+      } catch (e) {
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Something went wrong! Please try again later.')));
+      }
     } else {
       updateProduct(
           _formData['title'],

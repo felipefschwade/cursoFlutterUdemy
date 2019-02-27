@@ -15,7 +15,7 @@ class PriceTag extends StatelessWidget {
         color: Theme.of(context).accentColor
       ),
       child: Text(
-        '\$ ${price}',
+        '\$ $price',
         style: TextStyle(
           color: Colors.white,
           fontSize: 16.0
