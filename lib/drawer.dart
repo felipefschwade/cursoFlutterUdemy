@@ -1,3 +1,4 @@
+import 'package:curso_udemy/widgets/ui_elements/logout_list_tile.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -31,7 +32,9 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pushReplacementNamed(context, "/products");
             },
-          )
+          ),
+          Divider(),
+          LogoutListTile()
         ],
       ),
     );

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:curso_udemy/env.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 mixin ConnectedProducts on Model {
   List < Product > _products = [];
@@ -149,6 +150,7 @@ mixin ProductsModel on ConnectedProducts {
 
   Future<Null> fetchProducts() {
     _isLoading = true;
+    final String token =_authUser.token;
     return http.get('https://flutter-products-fcae1.firebaseio.com/products.json')
       .then < Null > ((Response res) {
         final List < Product > fetchedProducts = [];
@@ -195,6 +197,11 @@ mixin ProductsModel on ConnectedProducts {
 }
 
 mixin UserModel on ConnectedProducts {
+
+  User get authUser {
+    return _authUser;
+  }
+
   Future<Map<String, dynamic>> authenticate(String email, String password, [AuthMode mode = AuthMode.Login]) async {
     try {
       _isLoading = true;
@@ -206,6 +213,7 @@ mixin UserModel on ConnectedProducts {
       if (mode == AuthMode.Login) {
         response = await http.post(
           'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${Env.env['apiKey']}',
+          body: json.encode(formData),
           headers: {'Content-Type': 'application/json'}
         );
       } else {
@@ -218,13 +226,18 @@ mixin UserModel on ConnectedProducts {
       final Map<String, dynamic> responseData = json.decode(response.body);
       _isLoading = false;
       notifyListeners();
-      if (response.statusCode != 200 && response.statusCode != 201) {
+      if (response.statusCode != 200 && response.statusCode != 201 && !responseData.containsKey('idToken')) {
         String message = 'Ops, something went wrong!';
         if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') message = 'This email was not found.';
         else if (responseData['error']['message'] == 'INVALID_PASSWORD') message = 'The password is invalid.';
         else if (responseData['error']['message'] == 'EMAIL_EXISTS') message = 'This email already exists.';
         return {'success': false, 'message': message};
       }
+      _authUser = User(id: responseData['localId'], email: email, token: responseData['idToken']);
+      final SharedPreferences prefs =  await SharedPreferences.getInstance();
+      prefs.setString('token', responseData['idToken']);
+      prefs.setString('userEmail', email);
+      prefs.setString('userId', responseData['localId']);
       return {'success': true, 'message': 'Authentication Succeeded!'}; 
     } catch (e) {
       _isLoading = false;
@@ -232,6 +245,26 @@ mixin UserModel on ConnectedProducts {
       return {'success': false, 'message': 'Ops, something went wrong!'}; 
     }
   }
+
+  void autoAuth() async {
+    final SharedPreferences prefs =  await SharedPreferences.getInstance();
+    final String token = prefs.getString('token');
+    if (token != null) {
+      final String email = prefs.getString('userEmail');
+      final String userId = prefs.getString('userId');
+      _authUser = User(email: email, id: userId, token: token);
+      notifyListeners();
+    }
+  }
+
+  void logout() async {
+    _authUser = null;
+    final SharedPreferences prefs =  await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('userEmail');
+    await prefs.remove('userId');
+  }
+
 }
 
 mixin UtilityModel on ConnectedProducts {

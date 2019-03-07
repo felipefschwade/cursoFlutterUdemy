@@ -18,11 +18,19 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  final MainModel _model = MainModel();
+
+  @override
+  void initState() {
+    _model.autoAuth();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final model = MainModel();
+    
     return ScopedModel<MainModel>( 
-      model: model,
+      model: _model,
       child: MaterialApp(
         theme: ThemeData(
           brightness: Brightness.light,
@@ -38,10 +46,10 @@ class _AppState extends State<App> {
             button: TextStyle(color: Colors.white),
           )
         ),
-        home: AuthPage(),
+        home: _model.authUser == null ? AuthPage() : ProductsPage(_model),
         routes: {
-          '/products' : (BuildContext context) => ProductsPage(model),
-          '/admin' : (BuildContext context) => AdminPage(model),
+          '/products' : (BuildContext context) => ProductsPage(_model),
+          '/admin' : (BuildContext context) => AdminPage(_model),
         },
         onGenerateRoute: (RouteSettings settings) {
           final List<String> pathElements = settings.name.split('/');
@@ -50,7 +58,7 @@ class _AppState extends State<App> {
           }
           if (pathElements[1] == 'product') {
             final String productId =  pathElements[2];
-            final product = model.allProducts.firstWhere((Product p) => p.id == productId);
+            final product = _model.allProducts.firstWhere((Product p) => p.id == productId);
             return MaterialPageRoute<bool>(
               builder: (BuildContext context) => ProductPage(product)
             );
@@ -58,7 +66,7 @@ class _AppState extends State<App> {
           return null;
         },
         onUnknownRoute: (RouteSettings settings) {
-          return MaterialPageRoute(builder: (BuildContext context) => ProductsPage(model));
+          return MaterialPageRoute(builder: (BuildContext context) => ProductsPage(_model));
         },
       ),
     );
