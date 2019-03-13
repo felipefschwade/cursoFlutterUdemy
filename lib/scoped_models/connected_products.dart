@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:curso_udemy/env.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rxdart/rxdart.dart';
 
 mixin ConnectedProducts on Model {
   List < Product > _products = [];
@@ -150,7 +151,6 @@ mixin ProductsModel on ConnectedProducts {
 
   Future<Null> fetchProducts() {
     _isLoading = true;
-    final String token =_authUser.token;
     return http.get('https://flutter-products-fcae1.firebaseio.com/products.json')
       .then < Null > ((Response res) {
         final List < Product > fetchedProducts = [];
@@ -197,9 +197,15 @@ mixin ProductsModel on ConnectedProducts {
 }
 
 mixin UserModel on ConnectedProducts {
+  Timer _authTimer;
+  PublishSubject<bool> _userSubject = PublishSubject();
 
   User get authUser {
     return _authUser;
+  }
+
+  PublishSubject<bool> get userSubject {
+    return _userSubject;
   }
 
   Future<Map<String, dynamic>> authenticate(String email, String password, [AuthMode mode = AuthMode.Login]) async {
@@ -207,7 +213,7 @@ mixin UserModel on ConnectedProducts {
       _isLoading = true;
       final Map<String, String> formData = {
         'email': email,
-        'password': password,
+        'password': password
       };
       Response response;
       if (mode == AuthMode.Login) {
@@ -234,10 +240,16 @@ mixin UserModel on ConnectedProducts {
         return {'success': false, 'message': message};
       }
       _authUser = User(id: responseData['localId'], email: email, token: responseData['idToken']);
+      _userSubject.add(true);
+      final int expiration = 3600;
+      final DateTime now = DateTime.now();
+      final DateTime expireTime = now.add(Duration(seconds: expiration));
+      this.setAuthTimeout(expiration);
       final SharedPreferences prefs =  await SharedPreferences.getInstance();
       prefs.setString('token', responseData['idToken']);
       prefs.setString('userEmail', email);
       prefs.setString('userId', responseData['localId']);
+      prefs.setString('expireTime', expireTime.toIso8601String());
       return {'success': true, 'message': 'Authentication Succeeded!'}; 
     } catch (e) {
       _isLoading = false;
@@ -249,20 +261,36 @@ mixin UserModel on ConnectedProducts {
   void autoAuth() async {
     final SharedPreferences prefs =  await SharedPreferences.getInstance();
     final String token = prefs.getString('token');
+    final String expiryString = prefs.getString('expiryTime');
     if (token != null) {
+      final DateTime now = DateTime.now();
+      final DateTime parsedExpiryTime = DateTime.parse(expiryString);
+      if (parsedExpiryTime.isBefore(now)) {
+        _authUser = null;
+        return;
+      }
       final String email = prefs.getString('userEmail');
       final String userId = prefs.getString('userId');
+      final int tokenLifeTime = parsedExpiryTime.difference(now).inSeconds;
       _authUser = User(email: email, id: userId, token: token);
+      _userSubject.add(true);
+      this.setAuthTimeout(tokenLifeTime);
       notifyListeners();
     }
   }
 
   void logout() async {
     _authUser = null;
+    _authTimer.cancel();
+    _userSubject.add(false);
     final SharedPreferences prefs =  await SharedPreferences.getInstance();
     await prefs.remove('token');
     await prefs.remove('userEmail');
     await prefs.remove('userId');
+  }
+
+  void setAuthTimeout(int time) {
+    _authTimer = Timer(Duration(seconds: time), logout);
   }
 
 }

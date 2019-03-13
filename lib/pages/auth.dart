@@ -122,7 +122,7 @@ class _AuthPageState extends State<AuthPage> {
     if (_formKey.currentState.validate() && _formData['acceptTerms']) {
       _formKey.currentState.save();
       final Map<String, dynamic> responseInfo = await authenticationFunc(_formData['email'], _formData['password'], _authMode);
-      if (responseInfo['success']) Navigator.pushReplacementNamed(context, "/products");
+      if (responseInfo['success']) Navigator.of(context).pushReplacementNamed('/');
       else _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(responseInfo['message'])));
     }
   }

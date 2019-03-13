@@ -19,10 +19,16 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final MainModel _model = MainModel();
+  bool _isAuthenticated = false;
 
   @override
   void initState() {
     _model.autoAuth();
+    _model.userSubject.listen((bool isAuthenticated) {
+      setState(() {
+        _isAuthenticated = isAuthenticated;
+      });
+    });
     super.initState();
   }
 
@@ -46,12 +52,16 @@ class _AppState extends State<App> {
             button: TextStyle(color: Colors.white),
           )
         ),
-        home: _model.authUser == null ? AuthPage() : ProductsPage(_model),
         routes: {
-          '/products' : (BuildContext context) => ProductsPage(_model),
-          '/admin' : (BuildContext context) => AdminPage(_model),
+          '/': (BuildContext context) => !_isAuthenticated ? AuthPage() : ProductsPage(_model),
+          '/admin' : (BuildContext context) => !_isAuthenticated ? AuthPage() : AdminPage(_model),
         },
         onGenerateRoute: (RouteSettings settings) {
+          if (!_isAuthenticated) {
+            return MaterialPageRoute<bool>(
+              builder: (BuildContext context) =>  AuthPage()
+            );
+          }
           final List<String> pathElements = settings.name.split('/');
           if (pathElements[0] != '') {
             return null;
@@ -66,7 +76,9 @@ class _AppState extends State<App> {
           return null;
         },
         onUnknownRoute: (RouteSettings settings) {
-          return MaterialPageRoute(builder: (BuildContext context) => ProductsPage(_model));
+          return MaterialPageRoute(
+            builder: (BuildContext context) => !_isAuthenticated ? AuthPage() : ProductsPage(_model)
+          );
         },
       ),
     );
