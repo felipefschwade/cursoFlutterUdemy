@@ -19,7 +19,7 @@ class _ProductsLisState extends State<ProductListPage> {
 
   @override
   void initState() {
-    widget.model.fetchProducts();
+    widget.model.fetchProducts(onlyForUser: true);
     super.initState();
   }
 
@@ -67,6 +67,15 @@ class _ProductsLisState extends State<ProductListPage> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
+        if (model.isLoading) return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              CircularProgressIndicator(),
+              Text('Loading...')
+            ],
+          ),
+        );
         return ListView.builder(
           itemCount: model.allProducts.length,
           itemBuilder: (BuildContext context, int index) {

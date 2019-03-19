@@ -114,7 +114,7 @@ mixin ProductsModel on ConnectedProducts {
       });
   }
 
-  void toggleProductFavoriteStatus() {
+  void toggleProductFavoriteStatus() async {
     final bool currentlyFavorite = selectedProduct.isFavorite;
     final bool newFavoriteStatus = !currentlyFavorite;
     _products[selectedProductIndex] = Product(
@@ -126,8 +126,29 @@ mixin ProductsModel on ConnectedProducts {
       isFavorite: newFavoriteStatus,
       userEmail: selectedProduct.userEmail,
       userId: selectedProduct.userId);
-    notifyListeners();
-    _selProductId = null;
+    Response resp;
+    if (newFavoriteStatus) {
+        resp = await http.put('https://flutter-products-fcae1.firebaseio.com/products/${selectedProduct.id}/wishListUsers/${_authUser.id}.json',
+        body: json.encode(true)
+      );
+    } else {
+      resp = await http.delete(
+        'https://flutter-products-fcae1.firebaseio.com/products/${selectedProduct.id}/wishListUsers/${_authUser.id}.json'
+      );
+    }
+    if (resp.statusCode != 200 && resp.statusCode != 201) {
+      _products[selectedProductIndex] = Product(
+        id: selectedProduct.id,
+        title: selectedProduct.title,
+        description: selectedProduct.description,
+        image: selectedProduct.image,
+        price: selectedProduct.price,
+        isFavorite: !newFavoriteStatus,
+        userEmail: selectedProduct.userEmail,
+        userId: selectedProduct.userId);
+        notifyListeners();
+    }
+      _selProductId = null;
   }
 
   Future<bool> deleteProduct() {
@@ -149,7 +170,7 @@ mixin ProductsModel on ConnectedProducts {
       });
   }
 
-  Future<Null> fetchProducts() {
+  Future<Null> fetchProducts({bool onlyForUser = false}) {
     _isLoading = true;
     return http.get('https://flutter-products-fcae1.firebaseio.com/products.json')
       .then < Null > ((Response res) {
@@ -168,11 +189,13 @@ mixin ProductsModel on ConnectedProducts {
             price: item['price'],
             title: item['title'],
             userEmail: item['userEmail'],
-            userId: item['userId']
+            userId: item['userId'],
+            isFavorite: item['wishListUsers'] == null ? false :
+              (item['wishListUsers'] as Map<String, dynamic>).containsKey(_authUser.id)
           );
           fetchedProducts.add(product);
         });
-        _products = fetchedProducts;
+        _products = !onlyForUser ? fetchedProducts : _products =fetchedProducts.where((Product p) => p.userId ==_authUser.id).toList();
         _isLoading = false;
         notifyListeners();
         _selProductId = null;
@@ -261,7 +284,7 @@ mixin UserModel on ConnectedProducts {
   void autoAuth() async {
     final SharedPreferences prefs =  await SharedPreferences.getInstance();
     final String token = prefs.getString('token');
-    final String expiryString = prefs.getString('expiryTime');
+    final String expiryString = prefs.getString('expireTime');
     if (token != null) {
       final DateTime now = DateTime.now();
       final DateTime parsedExpiryTime = DateTime.parse(expiryString);
