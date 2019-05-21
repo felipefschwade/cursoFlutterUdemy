@@ -1,4 +1,5 @@
 import 'package:curso_udemy/models/auth.dart';
+import 'package:curso_udemy/models/location_data.dart';
 import 'package:curso_udemy/models/product.dart';
 import 'package:curso_udemy/models/user.dart';
 import 'package:http/http.dart';
@@ -48,7 +49,7 @@ mixin ProductsModel on ConnectedProducts {
     return _selProductId;
   }
 
-  Future<bool> addProduct(String title, String description, double price, String image) async {
+  Future<bool> addProduct(String title, String description, double price, String image, LocationData locData) async {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> productData = {
@@ -57,7 +58,10 @@ mixin ProductsModel on ConnectedProducts {
       'price': price,
       'image': 'http://www.luisaabram.com.br/wp-content/uploads/2016/02/ochocolate_barra01-600x478.jpg',
       'userId': _authUser.id,
-      'userEmail': _authUser.email
+      'userEmail': _authUser.email,
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address,
     };
     try {
       final Response res = await http.post('https://flutter-products-fcae1.firebaseio.com/products.json', body: json.encode(productData));
@@ -67,7 +71,15 @@ mixin ProductsModel on ConnectedProducts {
         return false;
       }
       final Map<String, dynamic> responseData = json.decode(res.body);
-      final Product product = Product(id: responseData['name'], title: title, description: description, image: image, price: price, userEmail: _authUser.email, userId: _authUser.id);
+      final Product product = Product(
+        id: responseData['name'], 
+        title: title, 
+        description: description,
+        image: image, 
+        price: price,
+        userEmail: _authUser.email, 
+        userId: _authUser.id,
+        location: locData);
       _products.add(product);
       _selProductId = null;
       notifyListeners();
@@ -79,7 +91,7 @@ mixin ProductsModel on ConnectedProducts {
     }
   }
 
-  Future<bool> updateProduct(String title, String description, double price, String image, {
+  Future<bool> updateProduct(String title, String description, double price, String image, LocationData locData, {
     bool isFavorite = false
   }) {
     _isLoading = true;
@@ -90,6 +102,9 @@ mixin ProductsModel on ConnectedProducts {
       'price': price,
       'image': 'http://www.luisaabram.com.br/wp-content/uploads/2016/02/ochocolate_barra01-600x478.jpg',
       'userId': _authUser.id,
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address,
       'userEmail': _authUser.email
     };
     return http.put('https://flutter-products-fcae1.firebaseio.com/products/${selectedProduct.id}.json', body: json.encode(updateData))
@@ -188,6 +203,10 @@ mixin ProductsModel on ConnectedProducts {
             image: item['image'],
             price: item['price'],
             title: item['title'],
+            location: LocationData(
+              address: item['loc_address'], 
+              latitude: item['loc_lat'], 
+              longitude: item['loc_lng']),
             userEmail: item['userEmail'],
             userId: item['userId'],
             isFavorite: item['wishListUsers'] == null ? false :
@@ -210,6 +229,9 @@ mixin ProductsModel on ConnectedProducts {
 
   void selectProduct(String productId) {
     _selProductId = productId;
+    if (productId == null) {
+      return;
+    }
     notifyListeners();
   }
 

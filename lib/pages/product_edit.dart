@@ -1,6 +1,8 @@
 import 'package:curso_udemy/models/product.dart';
 import 'package:curso_udemy/scoped_models/main.dart';
+import 'package:curso_udemy/widgets/form_inputs/location.dart';
 import 'package:flutter/material.dart';
+import 'package:curso_udemy/models/location_data.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductEditPage extends StatefulWidget {
@@ -17,6 +19,7 @@ class _ProductEditState extends State<ProductEditPage> {
     'description': null,
     'price': null,
     'image': 'assets/food.jpg',
+    'location': null,
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   
@@ -83,6 +86,10 @@ class _ProductEditState extends State<ProductEditPage> {
     );
   }
 
+  void _setLocation(LocationData data) {
+    _formData['location'] = data;
+  }
+
   void _submitForm(Function addProduct, Function updateProduct, Function setSelectedProduct, [int selectedProductIndex]) async {
     // Usage without autovalidate.
     if (!_formKey.currentState.validate()) return;
@@ -95,6 +102,7 @@ class _ProductEditState extends State<ProductEditPage> {
           _formData['description'],
           _formData['price'],
           'assets/food.jpg',
+          _formData['location']
         );
         if (success) Navigator.pushReplacementNamed(context, '/products').then((_) => setSelectedProduct(null));
         else Scaffold.of(context).showSnackBar(SnackBar(content: Text('Something went wrong! Please try again later.')));
@@ -107,6 +115,7 @@ class _ProductEditState extends State<ProductEditPage> {
           _formData['description'],
           _formData['price'],
           'assets/food.jpg',
+          _formData['location'],
       ).then((bool success) {
         if (success) Navigator.pushReplacementNamed(context, '/products').then((_) => setSelectedProduct(null));
         else Scaffold.of(context).showSnackBar(SnackBar(content: Text('Something went wrong! Please try again later.')));
@@ -133,7 +142,9 @@ class _ProductEditState extends State<ProductEditPage> {
               _buildTitleTextField(product),
               _buildDescriptionTextField(product),
               _buildPriceTextField(product),
-              SizedBox(height:  10.0),
+              SizedBox(height: 10.0),
+              LocationInput(_setLocation, product),
+              SizedBox(height: 10.0),
               _buildSubmitButton(),
             ]
           ),
