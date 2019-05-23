@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
+import 'package:location/location.dart' as geoLoc;
 import 'package:curso_udemy/models/location_data.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:curso_udemy/env.dart';
 
 class LocationInput extends StatefulWidget {
   final Function setLocation;
@@ -35,7 +36,7 @@ class _LocationInputState extends State<LocationInput> {
     _addressInputFocusNode.addListener(_updateLocation);
     if (widget.product != null) {
       _fieldController.text = widget.product.location.address;
-      _updateLocation(true);
+      _updateLocation(geocode: true);
     }
   }
 
@@ -45,7 +46,28 @@ class _LocationInputState extends State<LocationInput> {
     super.dispose();
   }
 
-  void _updateLocation([geocode = false]) async {
+  Future<String> _getAddress(double lat, double lng) async {
+    final Uri url = Uri.https(
+    'maps.googleapis.com',
+    '/maps/api/geocode/json',
+    {
+      'latlng': '${lat.toString()},${lng.toString()}',
+      'key': ''
+    });
+    final response = await http.get(url);
+    final decodedResp = json.decode(response.body);
+    final formatedAddress = decodedResp['results'][0]['formatted_address'];
+    return formatedAddress;
+  }
+
+  void _getUserLocation() async {
+    final location = geoLoc.Location();
+    final currentUserLoc = await location.getLocation();
+    final address = await _getAddress(currentUserLoc.latitude, currentUserLoc.longitude);
+
+  }
+
+  void _updateLocation({bool geocode = false, double lat, double lng}) async {
     final String address = _fieldController.text.trim();
     var coords;
     var formatedAddress;
@@ -60,7 +82,7 @@ class _LocationInputState extends State<LocationInput> {
           '/maps/api/geocode/json',
           {
             'address': address,
-            'key': 'AIzaSyCo3g7ATyPNuloj6HW5JQdHIVeQDaelYms'
+            'key': Env.env['mapsApiKey']
           });
         final response = await http.get(url);
         final decodedResp = json.decode(response.body);
@@ -134,6 +156,11 @@ class _LocationInputState extends State<LocationInput> {
             labelText: 'Address',
             icon: Icon(Icons.location_on),
           ),
+        ),
+        SizedBox(height: 10.0),
+        FlatButton(
+          child: Text('Use my location'),
+          onPressed: _getUserLocation,
         ),
         SizedBox(height: 10.0),
         Container(
